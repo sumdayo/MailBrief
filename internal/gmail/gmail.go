@@ -3,6 +3,7 @@ package gmail
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"google.golang.org/api/gmail/v1"
@@ -23,8 +24,12 @@ func NewClient(ctx context.Context) (*Client, error) {
 
 func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gmail.Message, error) {
 	user := "me"
-	query := fmt.Sprintf("is:unread after:%d", after.Unix())
-	
+	// Gmail API requires date format YYYY/MM/DD, not Unix timestamp
+	dateStr := after.Format("2006/01/02")
+	query := fmt.Sprintf("is:unread after:%s", dateStr)
+
+	slog.Info("Gmail search query", "query", query, "after_date", dateStr)
+
 	var messages []*gmail.Message
 	pageToken := ""
 	for {
