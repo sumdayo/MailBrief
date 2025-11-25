@@ -1,0 +1,41 @@
+# Binaries
+main
+mailbrief
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Environment variables and secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Google Cloud credentials
+client_secret.json
+credentials.json
+token.json
+service-account.json
+*-key.json
+
+# Go
+vendor/
+go.work
+go.work.sum
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+*.out
+coverage.html
+
+# Logs
+*.log
