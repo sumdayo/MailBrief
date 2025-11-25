@@ -3,7 +3,7 @@ package gmail
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	"os"
 	"time"
 
 	"google.golang.org/api/gmail/v1"
@@ -23,12 +23,13 @@ func NewClient(ctx context.Context) (*Client, error) {
 }
 
 func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gmail.Message, error) {
-	user := "me"
-	// Gmail API requires date format YYYY/MM/DD, not Unix timestamp
+	user := os.Getenv("GMAIL_USER")
+	if user == "" {
+		user = "me"
+	}
+	// Use Gmail query with date filter (YYYY/MM/DD) to fetch only newer unread messages
 	dateStr := after.Format("2006/01/02")
 	query := fmt.Sprintf("is:unread after:%s", dateStr)
-
-	slog.Info("Gmail search query", "query", query, "after_date", dateStr)
 
 	var messages []*gmail.Message
 	pageToken := ""
@@ -48,7 +49,10 @@ func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gm
 }
 
 func (c *Client) GetMessage(ctx context.Context, msgID string) (*gmail.Message, error) {
-	user := "me"
+	user := os.Getenv("GMAIL_USER")
+	if user == "" {
+		user = "me"
+	}
 	msg, err := c.service.Users.Messages.Get(user, msgID).Do()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve message %v: %v", msgID, err)
