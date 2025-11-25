@@ -4,7 +4,6 @@ go 1.24.2
 
 require (
 	cloud.google.com/go/firestore v1.20.0
-	cloud.google.com/go/vertexai v0.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/joho/godotenv v1.5.1
 	github.com/line/line-bot-sdk-go/v8 v8.18.0
@@ -13,12 +12,10 @@ require (
 
 require (
 	cloud.google.com/go v0.121.6 // indirect
-	cloud.google.com/go/aiplatform v1.90.0 // indirect
 	cloud.google.com/go/auth v0.17.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/functions v1.19.6 // indirect
-	cloud.google.com/go/iam v1.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.15.2 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
