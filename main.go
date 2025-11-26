@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"mailbrief/internal/firestore"
-	"mailbrief/internal/gmail"
-	"mailbrief/internal/line"
+	"github.com/sumdayo/mailbrief/internal/firestore"
+	"github.com/sumdayo/mailbrief/internal/gmail"
+	"github.com/sumdayo/mailbrief/internal/line"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
