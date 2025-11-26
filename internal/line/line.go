@@ -12,9 +12,16 @@ type Client struct {
 }
 
 func NewClient(channelAccessToken, userID string) (*Client, error) {
+	if channelAccessToken == "" {
+		return nil, fmt.Errorf("channel access token is required")
+	}
+	if userID == "" {
+		return nil, fmt.Errorf("user ID is required")
+	}
+
 	bot, err := messaging_api.NewMessagingApiAPI(channelAccessToken)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create line bot client: %v", err)
+		return nil, fmt.Errorf("failed to create LINE bot client: %v", err)
 	}
 	return &Client{bot: bot, userID: userID}, nil
 }
