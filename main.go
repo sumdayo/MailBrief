@@ -145,8 +145,6 @@ func ProcessEmails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Silenced: logger.Info("📨 未読メッセージを発見", "count", len(messages))
-
 	// 5. Process Each Message
 	processedCount := 0
 	var latestTime time.Time = lastProcessed
