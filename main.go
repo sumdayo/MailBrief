@@ -1,4 +1,4 @@
-package mailbrief
+package main
 
 import (
 	"fmt"
