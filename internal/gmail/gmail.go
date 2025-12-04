@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings" 
+	"strings"
 	"time"
 
 	"google.golang.org/api/gmail/v1"
@@ -38,7 +38,7 @@ func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gm
 
 	// 指定アドレスのみに絞る処理
 	targetEmails := os.Getenv("TARGET_EMAILS")
-	
+
 	if targetEmails != "" {
 		emails := strings.Split(targetEmails, ",")
 
@@ -46,14 +46,14 @@ func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gm
 		for _, email := range emails {
 			fromQueries = append(fromQueries, fmt.Sprintf("from:%s", strings.TrimSpace(email)))
 		}
-		
+
 		if len(fromQueries) > 0 {
 			queryParts = append(queryParts, fmt.Sprintf("(%s)", strings.Join(fromQueries, " OR ")))
 		}
 	}
 
 	finalQuery := strings.Join(queryParts, " ")
-	
+
 	var messages []*gmail.Message
 	pageToken := ""
 	for {
