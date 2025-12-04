@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings" 
 	"time"
 
 	"google.golang.org/api/gmail/v1"
@@ -22,19 +23,41 @@ func NewClient(ctx context.Context) (*Client, error) {
 	return &Client{service: srv}, nil
 }
 
+// フィルタリング機能
 func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gmail.Message, error) {
 	user := os.Getenv("GMAIL_USER")
 	if user == "" {
 		user = "me"
 	}
-	// Use Gmail query with date filter (YYYY/MM/DD) to fetch only newer unread messages
-	dateStr := after.Format("2006/01/02")
-	query := fmt.Sprintf("is:unread after:%s", dateStr)
 
+	dateStr := after.Format("2006/01/02")
+	queryParts := []string{
+		"is:unread",
+		fmt.Sprintf("after:%s", dateStr),
+	}
+
+	// 指定アドレスのみに絞る処理
+	targetEmails := os.Getenv("TARGET_EMAILS")
+	
+	if targetEmails != "" {
+		emails := strings.Split(targetEmails, ",")
+
+		var fromQueries []string
+		for _, email := range emails {
+			fromQueries = append(fromQueries, fmt.Sprintf("from:%s", strings.TrimSpace(email)))
+		}
+		
+		if len(fromQueries) > 0 {
+			queryParts = append(queryParts, fmt.Sprintf("(%s)", strings.Join(fromQueries, " OR ")))
+		}
+	}
+
+	finalQuery := strings.Join(queryParts, " ")
+	
 	var messages []*gmail.Message
 	pageToken := ""
 	for {
-		req := c.service.Users.Messages.List(user).Q(query).PageToken(pageToken)
+		req := c.service.Users.Messages.List(user).Q(finalQuery).PageToken(pageToken)
 		r, err := req.Do()
 		if err != nil {
 			return nil, fmt.Errorf("unable to retrieve messages: %v", err)
