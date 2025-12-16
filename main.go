@@ -1,4 +1,4 @@
-package mailbrief
+package main
 // GIthubActionsのテスト
 
 import (
