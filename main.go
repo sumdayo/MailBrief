@@ -1,4 +1,5 @@
 package mailbrief
+// GIthubActionsのテスト
 
 import (
 	"fmt"
