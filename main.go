@@ -1,5 +1,4 @@
 package main
-// GIthubActionsのテスト
 
 import (
 	"fmt"
@@ -12,6 +11,7 @@ import (
 	"github.com/sumdayo/mailbrief/internal/gmail"
 	"github.com/sumdayo/mailbrief/internal/line"
 
+	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/joho/godotenv"
 )
@@ -35,7 +35,6 @@ func init() {
 	functions.HTTP("ProcessEmails", ProcessEmails)
 }
 
-/*
 func main() {
 	// Check if running in Cloud Functions (FUNCTION_TARGET is set)
 	if os.Getenv("FUNCTION_TARGET") != "" {
@@ -83,7 +82,6 @@ type mockResponseWriter struct{}
 func (m *mockResponseWriter) Header() http.Header         { return http.Header{} }
 func (m *mockResponseWriter) Write(b []byte) (int, error) { return len(b), nil }
 func (m *mockResponseWriter) WriteHeader(statusCode int)  {}
-*/
 
 // ProcessEmails is the Cloud Function entry point
 // It checks for unread emails, sends notifications to LINE, and updates the state.
