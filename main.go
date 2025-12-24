@@ -1,4 +1,3 @@
-package main
 // package main
 package mailbrief
 
@@ -13,7 +12,6 @@ import (
 	"github.com/sumdayo/mailbrief/internal/gmail"
 	"github.com/sumdayo/mailbrief/internal/line"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/joho/godotenv"
 )
@@ -32,38 +30,6 @@ func init() {
 	lineUserID = os.Getenv("LINE_USER_ID")
 
 	functions.HTTP("ProcessEmails", ProcessEmails)
-}
-
-func main() {
-	// Check if running in Cloud Functions (FUNCTION_TARGET is set)
-	if os.Getenv("FUNCTION_TARGET") != "" {
-		// --- Cloud Functions Mode ---
-		port := os.Getenv("PORT")
-		if port == "" {
-			port = "8080"
-		}
-		if err := funcframework.Start(port); err != nil {
-			slog.Error("Failed to start function", "error", err)
-			os.Exit(1)
-		}
-	} else {
-		// --- Local Development Mode ---
-		// Run periodically every 1 minute
-		logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-		logger.Info("=== MailBrief Local Mode Started ===")
-		logger.Info("Checking for new emails every 1 minute...")
-
-		// Run immediately once
-		runLocalProcess(logger)
-
-		// Then run every 1 minute
-		ticker := time.NewTicker(1 * time.Minute)
-		defer ticker.Stop()
-
-		for range ticker.C {
-			runLocalProcess(logger)
-		}
-	}
 }
 
 // runLocalProcess executes the email processing logic locally
