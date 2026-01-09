@@ -2,6 +2,7 @@ package gmail
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"strings"
@@ -16,11 +17,41 @@ type Client struct {
 }
 
 func NewClient(ctx context.Context) (*Client, error) {
-	srv, err := gmail.NewService(ctx, option.WithScopes(gmail.GmailReadonlyScope))
+	// メール送信のために GMailSendScope を追加
+	srv, err := gmail.NewService(ctx, option.WithScopes(gmail.GmailReadonlyScope, gmail.GmailSendScope))
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve Gmail client: %v", err)
 	}
 	return &Client{service: srv}, nil
+}
+
+// SendReply sends a reply to a given thread.
+func (c *Client) SendReply(ctx context.Context, threadID, to, subject, body, inReplyTo, references string) error {
+	user := os.Getenv("GMAIL_USER")
+	if user == "" {
+		user = "me"
+	}
+
+	// RFC 2822 format for the email
+	messageStr := []byte(
+		"To: " + to + "\r\n" +
+			"Subject: " + subject + "\r\n" +
+			"In-Reply-To: " + inReplyTo + "\r\n" +
+			"References: " + references + "\r\n" +
+			"\r\n" +
+			body,
+	)
+
+	message := &gmail.Message{
+		Raw:      base64.URLEncoding.EncodeToString(messageStr),
+		ThreadId: threadID,
+	}
+
+	_, err := c.service.Users.Messages.Send(user, message).Do()
+	if err != nil {
+		return fmt.Errorf("failed to send reply: %w", err)
+	}
+	return nil
 }
 
 // フィルタリング機能
@@ -29,6 +60,8 @@ func (c *Client) ListUnreadMessages(ctx context.Context, after time.Time) ([]*gm
 	if user == "" {
 		user = "me"
 	}
+
+
 
 	dateStr := after.Format("2006/01/02")
 	queryParts := []string{
