@@ -107,3 +107,52 @@ func (c *Client) GetMessage(ctx context.Context, msgID string) (*gmail.Message, 
 	}
 	return msg, nil
 }
+
+func (c *Client) ListHistoryMessages(ctx context.Context, startHistoryID uint64) ([]*gmail.Message, error) {
+	user := os.Getenv("GMAIL_USER")
+	if user == "" {
+		user = "me"
+	}
+
+	var messages []*gmail.Message
+	pageToken := ""
+	for {
+		req := c.service.Users.History.List(user).
+			StartHistoryId(startHistoryID).
+			HistoryTypes("messageAdded").
+			PageToken(pageToken)
+		r, err := req.Do()
+		if err != nil {
+			return nil, fmt.Errorf("unable to retrieve history: %v", err)
+		}
+		for _, h := range r.History {
+			for _, m := range h.MessagesAdded {
+				if m != nil && m.Message != nil {
+					messages = append(messages, m.Message)
+				}
+			}
+		}
+		if r.NextPageToken == "" {
+			break
+		}
+		pageToken = r.NextPageToken
+	}
+	return messages, nil
+}
+
+func (c *Client) Watch(ctx context.Context, topicName string, labelIDs []string) (*gmail.WatchResponse, error) {
+	user := os.Getenv("GMAIL_USER")
+	if user == "" {
+		user = "me"
+	}
+
+	req := &gmail.WatchRequest{
+		TopicName: topicName,
+		LabelIds:  labelIDs,
+	}
+	resp, err := c.service.Users.Watch(user, req).Do()
+	if err != nil {
+		return nil, fmt.Errorf("unable to watch mailbox: %v", err)
+	}
+	return resp, nil
+}

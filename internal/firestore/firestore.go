@@ -26,6 +26,7 @@ func (c *Client) Close() error {
 
 type State struct {
 	LastProcessed time.Time `firestore:"last_processed"`
+	LastHistoryID uint64    `firestore:"last_history_id"`
 }
 
 func (c *Client) GetLastProcessedTime(ctx context.Context) (time.Time, error) {
@@ -45,9 +46,32 @@ func (c *Client) GetLastProcessedTime(ctx context.Context) (time.Time, error) {
 }
 
 func (c *Client) UpdateLastProcessedTime(ctx context.Context, t time.Time) error {
-	_, err := c.client.Collection("mail_state").Doc("latest").Set(ctx, State{LastProcessed: t})
+	_, err := c.client.Collection("mail_state").Doc("latest").Set(ctx, State{LastProcessed: t}, firestore.MergeAll)
 	if err != nil {
 		return fmt.Errorf("failed to update last processed time: %v", err)
+	}
+	return nil
+}
+
+func (c *Client) GetLastHistoryID(ctx context.Context) (uint64, error) {
+	doc, err := c.client.Collection("mail_state").Doc("latest").Get(ctx)
+	if err != nil {
+		if doc == nil || !doc.Exists() {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("failed to get last history id: %v", err)
+	}
+	var state State
+	if err := doc.DataTo(&state); err != nil {
+		return 0, fmt.Errorf("failed to parse state: %v", err)
+	}
+	return state.LastHistoryID, nil
+}
+
+func (c *Client) UpdateLastHistoryID(ctx context.Context, historyID uint64) error {
+	_, err := c.client.Collection("mail_state").Doc("latest").Set(ctx, State{LastHistoryID: historyID}, firestore.MergeAll)
+	if err != nil {
+		return fmt.Errorf("failed to update last history id: %v", err)
 	}
 	return nil
 }

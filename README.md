@@ -45,6 +45,16 @@ Google Cloud (GCP) を活用したサーバーレス構成です。
 3. 生成された `token.json` の内容を `GMAIL_OAUTH_TOKEN_JSON` にセット
    （もしくは `GMAIL_OAUTH_TOKEN_FILE=token.json` を使う）
 
+## Pub/Sub（Gmail Push通知）を使う場合
+
+1. Pub/Sub トピックを作成（例: `gmail-updates`）
+2. Gmail に Publish 権限を付与
+3. watch 登録
+   ```bash
+   PUBSUB_TOPIC="projects/your-project-id/topics/gmail-updates" go run ./cmd/gmail-watch
+   ```
+4. Cloud Functions のトリガーを Pub/Sub に変更（関数名: `ProcessPubSubEvent`）
+
 ## メモ
 
 - LINE Messaging APIでは、送信回数に対して月に200回までの上限が設けられている。なので他の通知方法を検討中。
