@@ -31,11 +31,19 @@ Google Cloud (GCP) を活用したサーバーレス構成です。
    GCP_PROJECT_ID=your-project-id
    LINE_CHANNEL_ACCESS_TOKEN=your-token
    LINE_USER_ID=your-user-id
+   GMAIL_OAUTH_TOKEN_JSON={"type":"authorized_user","client_id":"...","client_secret":"...","refresh_token":"..."}
    ```
-3. 実行
+3. Cloud Functions にデプロイして実行
+
+## 個人Gmail用の認証トークン生成
+
+1. Google Cloud Console で OAuth クライアント（デスクトップ）を作成し、`credentials.json` を取得
+2. トークン生成
    ```bash
-   go run main.go
+   go run ./cmd/gmail-oauth
    ```
+3. 生成された `token.json` の内容を `GMAIL_OAUTH_TOKEN_JSON` にセット
+   （もしくは `GMAIL_OAUTH_TOKEN_FILE=token.json` を使う）
 
 ## メモ
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
 	"google.golang.org/api/option"
 )
@@ -16,11 +17,35 @@ type Client struct {
 }
 
 func NewClient(ctx context.Context) (*Client, error) {
-	srv, err := gmail.NewService(ctx, option.WithScopes(gmail.GmailReadonlyScope))
+	creds, err := loadOAuthCredentials(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load Gmail OAuth credentials: %v", err)
+	}
+
+	var srv *gmail.Service
+	if creds != nil {
+		srv, err = gmail.NewService(ctx, option.WithCredentials(creds))
+	} else {
+		srv, err = gmail.NewService(ctx, option.WithScopes(gmail.GmailReadonlyScope))
+	}
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve Gmail client: %v", err)
 	}
 	return &Client{service: srv}, nil
+}
+
+func loadOAuthCredentials(ctx context.Context) (*google.Credentials, error) {
+	if envJSON := os.Getenv("GMAIL_OAUTH_TOKEN_JSON"); envJSON != "" {
+		return google.CredentialsFromJSON(ctx, []byte(envJSON), gmail.GmailReadonlyScope)
+	}
+	if path := os.Getenv("GMAIL_OAUTH_TOKEN_FILE"); path != "" {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read GMAIL_OAUTH_TOKEN_FILE: %v", err)
+		}
+		return google.CredentialsFromJSON(ctx, data, gmail.GmailReadonlyScope)
+	}
+	return nil, nil
 }
 
 // フィルタリング機能

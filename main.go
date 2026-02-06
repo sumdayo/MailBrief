@@ -1,4 +1,3 @@
-// package main
 package mailbrief
 
 import (
@@ -53,14 +52,12 @@ func ProcessEmails(w http.ResponseWriter, r *http.Request) {
 	// Use TextHandler for human-readable logs
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// 1. Validate Environment Variables
+	// 各IDが有効であるかチェック
 	if projectID == "" || lineChannelAccessToken == "" || lineUserID == "" {
 		logger.Error("❌ Missing required environment variables")
 		http.Error(w, "Internal Server Error: Missing configuration", http.StatusInternalServerError)
 		return
 	}
-
-	// Silenced: logger.Info("🔄 メールチェックを開始します...")
 
 	gmailClient, err := gmail.NewClient(ctx)
 	if err != nil {
@@ -99,7 +96,6 @@ func ProcessEmails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(messages) == 0 {
-		// Silenced: logger.Info("✅ 最新メールはありません")
 		fmt.Fprint(w, "No new messages")
 		return
 	}
