@@ -4,14 +4,15 @@ Gmail に届いた新着メールを検知し、LINE に即時通知するサー
 未読メールを定期的にチェックし、新しいメールが届くと LINE に通知します。
 一度通知したメールは重複して送らないように管理されています。
 
+![エンドユーザー（LINE）への出力画像](./Images/LINE_example.jpg)
+![MailBriefのアーキテクチャ図](./Images/architecture.jpg)
+
 ## アーキテクチャ
 
 Google Cloud (GCP) を活用したサーバーレス構成です。
 
 - **言語**: Go (1.22)
-- **基盤**: Cloud Functions
-- **トリガー**: Cloud Scheduler (定期実行)
-- **データベース**: Firestore (通知済みメールの管理)
+- **クラウド** GCP（Cloud Run）
 - **外部 API**:
   - Gmail API (メールの取得)
   - LINE Messaging API (通知送信)
