@@ -5,11 +5,12 @@ Gmail に届いた新着メールを検知し、LINE に即時通知するサー
 一度通知したメールは重複して送らないように管理されています。
 
 ![エンドユーザー（LINE）への出力画像](./Images/LINE_example.jpg)
-![MailBriefのアーキテクチャ図](./Images/architecture.jpg)
 
 ## アーキテクチャ
 
 Google Cloud (GCP) を活用したサーバーレス構成です。
+
+![MailBriefのアーキテクチャ図](./Images/architecture.jpg)
 
 - **言語**: Go (1.22)
 - **クラウド** GCP（Cloud Run）
